@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Order {
-  id           String      @id @default(cuid())
+  id           Int         @id @default(autoincrement())
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
   orderItems   OrderItem[]
@@ -31,11 +31,11 @@ enum OrderStatus {
 }
 
 model OrderItem {
-  id          String   @id @default(cuid())
+  id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   order       Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId     String?  @map("order_id") // if needed as well
+  orderId     Int?     @map("order_id")
   price       Decimal  @db.Decimal(10, 2)
   productName String   @map("product_name")
   quantity    Int
