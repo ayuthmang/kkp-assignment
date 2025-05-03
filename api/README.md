@@ -58,6 +58,49 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
 
+## Database Setup For Local Development
+
+We'll setup PostgreSQL database using Docker. Make sure you have Docker installed and running on your machine.
+
+1. Go to the root of the project that has the `docker-compose.yml` file.
+2. Run the following command to start the database:
+
+### Start the database using Docker Compose
+
+```bash
+$ docker-compose up -d
+```
+
+### Stop the database
+
+```bash
+$ docker-compose down
+```
+
+### Run migrations
+
+```bash
+$ pnpm prisma migrate dev
+```
+
+### Seed the database
+
+```bash
+$ pnpm prisma db seed
+```
+
+### Generate Prisma Client
+
+```bash
+$ pnpm prisma generate
+```
+
+### Open Prisma Studio
+
+```bash
+$ pnpm prisma studio
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
