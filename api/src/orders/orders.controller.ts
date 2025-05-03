@@ -12,7 +12,7 @@ import {
 import { OrderResponseSchema } from './dto/get-order.dto';
 import { UseZodGuard, ZodSerializerDto } from 'nestjs-zod';
 
-import { PaginationQueryDto } from '../commons/dto/pagination.dto';
+import { PaginationQueryDto } from '@/commons/dto/pagination.dto';
 
 @Controller('orders')
 export class OrdersController {

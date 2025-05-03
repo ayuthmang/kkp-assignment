@@ -1,18 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderBodyDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '@/prisma.service';
 import { statusMap, sumOrderItems } from './orders.helper';
 import { OrderStatus } from '@prisma/client';
-import { PaginationQueryDto } from '../commons/dto/pagination.dto';
-import { getPaginationParams } from '../commons/dto/pagination.helper';
+import { PaginationQueryDto } from '@/commons/dto/pagination.dto';
+import { getPaginationParams } from '@/commons/dto/pagination.helper';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   create(createOrderDto: CreateOrderBodyDto) {
-    // prisma transaction
     return this.prismaService.$transaction(async (prisma) => {
       const orderItems = createOrderDto.items.map((item) => ({
         productName: item.product_name,
