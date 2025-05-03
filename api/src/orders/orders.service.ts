@@ -81,8 +81,4 @@ export class OrdersService {
 
     return updatedOrder;
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
-  }
 }
