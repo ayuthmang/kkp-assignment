@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersService } from './orders.service';
+import { PrismaService } from '@/prisma.service';
+import { OrderStatus } from '@prisma/client';
 
 describe('OrdersService', () => {
   let service: OrdersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [OrdersService],
+      providers: [OrdersService, PrismaService],
     }).compile();
 
     service = module.get<OrdersService>(OrdersService);
@@ -19,7 +21,7 @@ describe('OrdersService', () => {
 
 describe('create', () => {
   it('should create an order successfully', async () => {
-    const dummyDto = {
+    const createOrderDto = {
       customer_name: 'John Doe',
       items: [
         { product_name: 'Product A', quantity: 2, price: 10 },
@@ -27,13 +29,8 @@ describe('create', () => {
       ],
     };
 
-    // Expected totalAmount: 2*10 + 1*20 = 40
     const expectedOrder = { id: 1, status: 'created' };
-
-    // Create a spy for the prisma.order.create method inside the transaction's callback.
     const createSpy = jest.fn().mockResolvedValue(expectedOrder);
-
-    // Mock prismaService with $transaction that calls the provided callback with a mocked prisma object.
     const prismaServiceMock = {
       $transaction: jest.fn(async (callback) => {
         const mockPrisma = {
@@ -47,15 +44,13 @@ describe('create', () => {
 
     const service = new OrdersService(prismaServiceMock as any);
 
-    const result = await service.create(dummyDto as any);
+    const result = await service.create(createOrderDto as any);
 
     expect(result).toEqual(expectedOrder);
-
-    // Verify that the prisma.order.create method was called with expected arguments.
     expect(createSpy).toHaveBeenCalledWith({
       data: {
-        customerName: dummyDto.customer_name,
-        status: expect.any(String),
+        customerName: createOrderDto.customer_name,
+        status: OrderStatus.CREATED,
         totalAmount: 40,
         orderItems: {
           createMany: {
@@ -79,5 +74,6 @@ describe('create', () => {
         status: true,
       },
     });
+    expect(createSpy).toHaveBeenCalledTimes(1);
   });
 });

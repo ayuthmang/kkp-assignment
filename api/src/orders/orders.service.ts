@@ -23,7 +23,7 @@ export class OrdersService {
       const order = await prisma.order.create({
         data: {
           customerName: createOrderDto.customer_name,
-          status: statusMap[OrderStatus.CREATED],
+          status: OrderStatus.CREATED,
           totalAmount,
           orderItems: {
             createMany: {
