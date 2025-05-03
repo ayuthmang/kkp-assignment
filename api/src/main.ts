@@ -10,7 +10,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 
-export async function registerGlobals(app: INestApplication) {
+export function registerGlobals(app: INestApplication) {
   /**
    * Swagger
    */
