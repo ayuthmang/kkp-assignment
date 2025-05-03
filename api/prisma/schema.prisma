@@ -26,8 +26,8 @@ model Order {
 }
 
 enum OrderStatus {
-  CREATED
-  COMPLETED
+  CREATED   @map("created")
+  COMPLETED @map("completed")
 }
 
 model OrderItem {

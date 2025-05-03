@@ -3,14 +3,18 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import {
+  UpdateOrderDto,
+  UpdateOrderParamDto,
+  UpdateOrderResponseDto,
+} from './dto/update-order.dto';
 import { OrderResponseSchema } from './dto/response.dto';
 import { UseZodGuard, ZodSerializerDto } from 'nestjs-zod';
 import { PaginationQueryDto } from './dto/get-query.dto';
@@ -38,7 +42,10 @@ export class OrdersController {
     return this.ordersService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put('/:id/status')
+  @UseZodGuard('params', UpdateOrderParamDto)
+  @UseZodGuard('body', UpdateOrderDto)
+  @ZodSerializerDto(UpdateOrderResponseDto)
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(+id, updateOrderDto);
   }
