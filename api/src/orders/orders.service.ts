@@ -1,26 +1,47 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateOrderBodyDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma.service';
-import { PaginationQueryDto } from './dto/get-query.dto';
-import { statusMap } from './orders.helper';
-
-export function getPaginationParams({ page = 1, size }: PaginationQueryDto) {
-  const validatedPage = page < 1 ? 1 : page;
-  const skip = (validatedPage - 1) * size;
-  return {
-    skip,
-    take: size,
-  };
-}
+import { statusMap, sumOrderItems } from './orders.helper';
+import { OrderStatus } from '@prisma/client';
+import { PaginationQueryDto } from '../commons/dto/pagination.dto';
+import { getPaginationParams } from '../commons/dto/pagination.helper';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  create(createOrderDto: CreateOrderBodyDto) {
+    // prisma transaction
+    return this.prismaService.$transaction(async (prisma) => {
+      const orderItems = createOrderDto.items.map((item) => ({
+        productName: item.product_name,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+      const totalAmount = sumOrderItems(orderItems);
+
+      const order = await prisma.order.create({
+        data: {
+          customerName: createOrderDto.customer_name,
+          status: statusMap[OrderStatus.CREATED],
+          totalAmount,
+          orderItems: {
+            createMany: {
+              data: orderItems,
+            },
+          },
+        },
+        select: {
+          id: true,
+          status: true,
+        },
+      });
+
+      return order;
+    });
   }
+
   async findAll(queryParams: PaginationQueryDto) {
     const { skip, take } = getPaginationParams(queryParams);
 

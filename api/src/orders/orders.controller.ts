@@ -1,21 +1,27 @@
 import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
+import {
+  CreateOrderBodyDto,
+  CreateOrderResponseDto,
+} from './dto/create-order.dto';
 import {
   UpdateOrderDto,
   UpdateOrderParamDto,
   UpdateOrderResponseDto,
 } from './dto/update-order.dto';
-import { OrderResponseSchema } from './dto/response.dto';
+import { OrderResponseSchema } from './dto/get-order.dto';
 import { UseZodGuard, ZodSerializerDto } from 'nestjs-zod';
-import { PaginationQueryDto } from './dto/get-query.dto';
+
+import { PaginationQueryDto } from '../commons/dto/pagination.dto';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
+  @UseZodGuard('body', CreateOrderBodyDto)
+  @ZodSerializerDto(CreateOrderResponseDto)
+  create(@Body() createOrderDto: CreateOrderBodyDto) {
     return this.ordersService.create(createOrderDto);
   }
 
